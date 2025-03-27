@@ -1,0 +1,4 @@
+rootProject.name = 'course_work'
+include 'ModuleGenerateData'
+include 'ModuleSendToWebSocket'
+include 'ModuleHandlerDataFromPLC'

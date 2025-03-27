@@ -1,0 +1,156 @@
+<!DOCTYPE html >
+<meta charset="UTF-8">
+<html>
+<head>
+    <title>WebSocket Data Tables</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        table {
+            width: 40%;
+            border-collapse: collapse;
+            float:left;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: center;
+            font-weight: 500;
+            border-bottom: 2px solid #e9ecef;
+        }
+        td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+<div class="table-container" id="tables-container"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tablesContainer = document.getElementById('tables-container');
+        const tableNames = [
+            "Temperature Sensors",
+            "Pressure Readings",
+            "Rotation Speed",
+            "Voltage Monitoring",
+            "System Efficiency"
+        ];
+        // Создаем 5 таблиц
+        const tableWrappers = [];
+        for (let i = 1; i <= 5; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'table-wrapper';
+            wrapper.id = `table-wrapper-${i}`;
+
+            // const title = document.createElement('div');
+            // title.className = 'table-title';
+            // title.id = `table-title-${i}`;
+            // title.textContent = `Загрузка...`;
+
+            const table = document.createElement('table');
+            table.id = `table-${i}`;
+            table.innerHTML = `
+<caption id ="table-title-${i}" class="table-title" ></caption>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Значение</th>
+                    <th>Время получения</th>
+                    <th>Минимальное значение</th>
+                    <th>Максимальное значение</th>
+                    <th>Этап</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Array(5).fill().map((_, j) => `
+                    <tr id="table-${i}-row-${j+1}">
+                        <td>${j+1}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        `;
+
+            //wrapper.appendChild(title);
+            wrapper.appendChild(table);
+            tablesContainer.appendChild(wrapper);
+            tableWrappers.push(wrapper);
+        }
+
+        const stompClient = new StompJs.Client({
+            brokerURL: 'ws://localhost:8081/websocket'
+        });
+        stompClient.activate();
+
+        stompClient.onConnect = (frame) => {
+            alert('Connected: ');
+            stompClient.publish({
+                destination: "/app/tables",
+                body: 'getTable'
+            });
+            stompClient.subscribe('/topic/tableNames', function(message) {
+                const names = JSON.parse(message.body).tableNames;
+                names.forEach((name, index) => {
+                    document.getElementById(`table-title-${index+1}`).textContent = name;
+                });
+            });
+            // Подписываемся на все 5 топиков
+            for (let i = 1; i <= 5; i++) {
+
+                stompClient.subscribe(`/topic/data/${i}`, (message) => {
+                    const data = JSON.parse(message.body);
+                    updateTable(i, data);
+                });
+            }
+        };
+
+        // Функция для обновления таблицы
+        function updateTable(tableNumber, data) {
+            const table = document.getElementById(`table-${tableNumber}`).getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+
+            // Сдвигаем строки вниз
+            for (let i = rows.length - 1; i > 0; i--) {
+                const prevCells = rows[i-1].getElementsByTagName('td');
+                const currentCells = rows[i].getElementsByTagName('td');
+
+                rows[i].style.background=rows[i-1].style.background;
+                currentCells[1].textContent = prevCells[1].textContent;
+                currentCells[2].textContent = prevCells[2].textContent;
+                currentCells[3].textContent = prevCells[3].textContent;
+                currentCells[4].textContent = prevCells[4].textContent;
+                currentCells[5].textContent = prevCells[5].textContent;
+            }
+
+            // Обновляем первую строку новыми данными
+            const firstRowCells = rows[0].getElementsByTagName('td');
+            if(data.error=="error"){
+                rows[0].style.background="red";
+            }
+            else rows[0].style.background="white";
+            firstRowCells[1].textContent = data.value.toFixed(4) +"C";
+            firstRowCells[2].textContent = new Date(data.timestamp).toLocaleTimeString();
+            firstRowCells[3].textContent = data.minValue;
+            firstRowCells[4].textContent = data.maxValue;
+            firstRowCells[5].textContent = data.stage;
+        }
+    });
+</script>
+</body>
+</html>
