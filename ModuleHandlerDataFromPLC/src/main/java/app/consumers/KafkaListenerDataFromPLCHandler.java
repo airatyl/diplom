@@ -33,7 +33,7 @@ public class KafkaListenerDataFromPLCHandler {
     public void listener(DataFromPLC data) {
         Paramoneachstage answer = paramoneachstageRepository.getParamoneachstageBySensor_IdAndMoldingstage_Id(data.getSensorId(),data.getProcessID());
         DataToWebSocket sendingData =new DataToWebSocket(data.getSensorId(), data.getValue(), new Date(),answer.getMinvalue(),answer.getMaxvalue(), data.getProcessID());
-        if (data.getValue()<answer.getMinvalue() || data.getValue()>answer.getMaxvalue()){
+        if (answer.getNeedcontrol() &&(data.getValue()<answer.getMinvalue() || data.getValue()>answer.getMaxvalue())){
             sendingData.setError(Optional.of("error"));
         }
         else sendingData.setError(Optional.empty());
