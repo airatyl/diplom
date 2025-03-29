@@ -15,14 +15,23 @@ import java.util.Optional;
 @Setter
 public class DataToWebSocket {
     private int sensorId;
-    private double value;
+    private float value;
     private Date timestamp;
-    private int minValue;
-    private int maxValue;
+    private float minValue;
+    private float maxValue;
     private int stage;
     private Optional<String> error;
 
-    public DataToWebSocket(double value, Date timestamp, int minValue, int maxValue, int stage) {
+    public DataToWebSocket(float value, Date timestamp, float minValue, float maxValue, int stage) {
+        this.value = value;
+        this.timestamp = timestamp;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.stage = stage;
+    }
+
+    public DataToWebSocket(int sensorId, float value, Date timestamp, float minValue, float maxValue, int stage) {
+        this.sensorId = sensorId;
         this.value = value;
         this.timestamp = timestamp;
         this.minValue = minValue;

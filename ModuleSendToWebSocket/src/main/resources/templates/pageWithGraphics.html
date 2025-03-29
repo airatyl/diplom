@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Графики</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .control-panel {
+            grid-column: span 2;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+        }
+        select, input {
+            padding: 8px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<h1>WebSocket Графики данных</h1>
+
+<div class="control-panel">
+    <h2>Отправка данных</h2>
+    <div class="form-group">
+        <label for="param">Параметр:</label>
+        <select id="param">
+            <option value="Давление прессования">Давление прессования</option>
+            <option value="Скорость охлаждения">Скорость охлаждения</option>
+            <option value="Давление на сплав в пресс-форме">Давление на сплав в пресс-форме</option>
+            <option value="Скорость поступления сплава">Скорость поступления сплава</option>
+            <option value="Температура пресс-формы">Температура пресс-формы</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="stage">Этап литья:</label>
+        <select id="stage">
+            <option value="1">Раскрытие пресс-формы и смазка</option>
+            <option value="2">Cмыкание пресс-формы и ее нагрев</option>
+            <option value="3">Заливка металла в камеру прессования</option>
+            <option value="4">Прессование</option>
+            <option value="5">Охлаждение</option>
+            <option value="6">Извлечение изделия</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="control">Необходимость контролировать:</label>
+        <select id="control">
+            <option value="true">Да</option>
+            <option value="false">Нет</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="minValue">Минимальное значение:</label>
+        <input type="number" id="minValue" value="0">
+    </div>
+    <div class="form-group">
+        <label for="maxValue">Максимальное значение</label>
+        <input type="number" id="maxValue" value="0">
+    </div>
+    <button id="sendBtn">Изменить</button>
+</div>
+
+<div class="container">
+    <div class="chart-container">
+        <canvas id="chart1"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart2"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart3"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart4"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart5"></canvas>
+    </div>
+</div>
+
+<script>
+
+
+    // Инициализация графиков
+    const charts = [];
+    const chartConfigs = [
+        { id: 'chart1', title: 'Давление прессования', color: 'rgba(75, 192, 192, 1)' },
+        { id: 'chart2', title: 'Скорость охлаждения', color: 'rgba(54, 162, 235, 1)' },
+        { id: 'chart3', title: 'Давление на сплав в пресс-форме', color: 'rgba(150, 99, 132, 1)' },
+        { id: 'chart4', title: 'Скорость поступления сплава', color: 'rgba(255, 159, 64, 1)' },
+        { id: 'chart5', title: 'Температура пресс-формы', color: 'rgba(153, 102, 255, 1)' }
+    ];
+
+    // Максимальное количество точек на графике
+    const MAX_DATA_POINTS = 50;
+
+    // Создаем графики
+    chartConfigs.forEach(config => {
+        const ctx = document.getElementById(config.id).getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: config.title,
+                    backgroundColor: config.color,
+                    borderColor: config.color,
+                    pointBackgroundColor: [],
+                    pointRadius: [],
+                    data: [],
+                    fill: false,
+
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        charts.push(chart);
+    });
+
+    const stompClient = new StompJs.Client({
+        brokerURL: 'ws://localhost:8081/websocket'
+    });
+    stompClient.activate();
+
+    stompClient.onConnect = (frame) => {
+        alert('Connected: ');
+        // stompClient.publish({
+        //     destination: "/app/tables",
+        //     body: 'getTable'
+        // });
+        // stompClient.subscribe('/topic/tableNames', function(message) {
+        //     const names = JSON.parse(message.body).tableNames;
+        //     names.forEach((name, index) => {
+        //         document.getElementById(`table-title-${index+1}`).textContent = name;
+        //     });
+        // });
+        // Подписываемся на все 5 топиков
+        for (let i = 1; i <= 5; i++) {
+
+            stompClient.subscribe(`/topic/data/${i}`, function(message) {
+                try {
+                    const data = JSON.parse(message.body);
+
+                    // Предполагаем, что данные приходят в формате {chart1: value, chart2: value, ...}
+                        updateChart(charts[i-1], data.value,data.error);
+
+                } catch (e) {
+                    console.error("Ошибка обработки данных:", e);
+                }
+            });
+        }
+    };
+
+    // Обработка входящих данных
+    // socket.onmessage = function(event) {
+    //     try {
+    //         const data = JSON.parse(event.data);
+    //         console.log("Получены данные:", data);
+    //
+    //         chartConfigs.forEach((config, index) => {
+    //             const value = data[`chart${index+1}`] || data[index] || 0;
+    //             updateChart(charts[index], value);
+    //         });
+    //
+    //     } catch (e) {
+    //         console.error("Ошибка обработки данных:", e);
+    //     }
+    // };
+
+    // Обновление графика новым значением
+    function updateChart(chart, value,error) {
+        const now = new Date();
+        const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
+        // Добавляем новую точку данных
+        chart.data.labels.push(timeLabel);
+        chart.data.datasets[0].data.push(value);
+        if(error){
+
+            chart.data.datasets[0].pointBackgroundColor.push('rgba(255, 0, 0, 1)');
+            chart.data.datasets[0].pointRadius.push(6);
+        }
+        else {
+            chart.data.datasets[0].pointBackgroundColor.push(chart.data.datasets[0].borderColor);
+            chart.data.datasets[0].pointRadius.push(3);
+        }
+
+
+        // Ограничиваем количество точек
+        if (chart.data.labels.length > MAX_DATA_POINTS) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+        }
+
+
+        // Обновляем график
+        chart.update();
+    }
+
+    // Отправка данных
+    document.getElementById('sendBtn').addEventListener('click', function() {
+        alert("adsad")
+        const param = document.getElementById('param').value;
+        const stage = document.getElementById('stage').value;
+        const control = document.getElementById('control').value;
+        const minValue = parseFloat(document.getElementById('minValue').value);
+        const maxValue = parseFloat(document.getElementById('maxValue').value);
+
+        const dataToSend = {
+            param: param,
+            stage: stage,
+            control: control,
+            minValue: minValue,
+            maxValue: maxValue
+        };
+
+        // stompClient.publish("/app/change",JSON.stringify(dataToSend));
+        //
+        // alert("adsad")
+
+        stompClient.publish({
+            destination: "/app/change",
+            body: JSON.stringify(dataToSend)
+        });
+
+    });
+</script>
+</body>
+</html>

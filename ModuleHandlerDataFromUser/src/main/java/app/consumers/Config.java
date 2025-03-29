@@ -1,7 +1,6 @@
-package app.kafka;
+package app.consumers;
 
 
-import app.data.DataToWebSocket;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +40,8 @@ public class Config {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DataFromPLC.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES,"*");
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DataToWebSocket.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return new DefaultKafkaConsumerFactory<>(props);

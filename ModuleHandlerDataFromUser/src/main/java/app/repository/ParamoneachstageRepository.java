@@ -1,11 +1,11 @@
 package app.repository;
 
 import app.entity.Paramoneachstage;
-import app.entity.ParamoneachstageId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ParamoneachstageRepository extends JpaRepository<Paramoneachstage, Integer> {
 
     Paramoneachstage getParamoneachstageBySensor_IdAndMoldingstage_Id(Integer sensor_id, Integer moldingstage_id);
-    Paramoneachstage getParamoneachstageById(ParamoneachstageId id);
+    Paramoneachstage getParamoneachstageByMoldingstage_IdAndControlparam(Integer moldingstage_id, String controlparam);
+
 }

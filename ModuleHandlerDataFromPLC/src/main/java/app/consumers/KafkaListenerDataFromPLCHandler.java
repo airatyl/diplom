@@ -2,13 +2,13 @@ package app.consumers;
 
 import app.data.DataFromPLC;
 import app.data.DataToWebSocket;
+import app.data.DataToWebSocketGraph;
 import app.entity.Paramoneachstage;
 import app.entity.Sensorvalue;
 import app.repository.ParamoneachstageRepository;
 import app.repository.SensorRepository;
 import app.repository.SensorvalueRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -33,11 +33,21 @@ public class KafkaListenerDataFromPLCHandler {
     public void listener(DataFromPLC data) {
         Paramoneachstage answer = paramoneachstageRepository.getParamoneachstageBySensor_IdAndMoldingstage_Id(data.getSensorId(),data.getProcessID());
         DataToWebSocket sendingData =new DataToWebSocket(data.getSensorId(), data.getValue(), new Date(),answer.getMinvalue(),answer.getMaxvalue(), data.getProcessID());
+
+        DataToWebSocketGraph graph= new DataToWebSocketGraph();
+        graph.setValue(data.getValue());
+        graph.setId(data.getSensorId());
+
         if (answer.getNeedcontrol() &&(data.getValue()<answer.getMinvalue() || data.getValue()>answer.getMaxvalue())){
             sendingData.setError(Optional.of("error"));
+            graph.setError(true);
         }
-        else sendingData.setError(Optional.empty());
-        kafkaTemplate.send("data-to-websocket",sendingData);
+        else{
+            sendingData.setError(Optional.empty());
+            graph.setError(false);
+        }
+
+        kafkaTemplate.send("data-to-websocket",graph);
 
         sensorvalueRepository.save(new Sensorvalue(data.getValue(),Instant.now(),sensorRepository.getReferenceById(data.getSensorId())));
         // answer =select from paramoneachstage where sensorId= data.sensorId and moldingstage= data.stageId
