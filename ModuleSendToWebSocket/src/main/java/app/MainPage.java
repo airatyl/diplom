@@ -20,4 +20,8 @@ public class MainPage {
 
         return "pageWithGraphics";
     }
+    @GetMapping("/login")
+    public String login(){
+        return "auth";
+    }
 }

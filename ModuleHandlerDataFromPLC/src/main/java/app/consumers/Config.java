@@ -31,20 +31,17 @@ public class Config {
         factory.getContainerProperties().setPollTimeout(3000);
         return factory;
     }
-
-
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "localhost:29092");
+                "localhost:29092");//Адрес сервера Kafka
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DataFromPLC.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DataFromPLC.class);//Класс, который получаем из Kafka
         props.put(JsonDeserializer.TRUSTED_PACKAGES,"*");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
         return new DefaultKafkaConsumerFactory<>(props);
     }
 }

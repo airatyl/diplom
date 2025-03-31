@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Графики</title>
+    <title>Мониторинг литья</title>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,11 +12,13 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
+
         .chart-container {
             position: relative;
             height: 300px;
@@ -25,6 +27,7 @@
             padding: 10px;
             border-radius: 5px;
         }
+
         .control-panel {
             grid-column: span 2;
             padding: 20px;
@@ -32,17 +35,21 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: inline-block;
             width: 150px;
         }
+
         select, input {
             padding: 8px;
             width: 200px;
         }
+
         button {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -52,16 +59,16 @@
             cursor: pointer;
             font-size: 16px;
         }
+
         button:hover {
             background-color: #45a049;
         }
     </style>
 </head>
 <body>
-<h1>WebSocket Графики данных</h1>
 
 <div class="control-panel">
-    <h2>Отправка данных</h2>
+    <h2>Изменение пороговых значений</h2>
     <div class="form-group">
         <label for="param">Параметр:</label>
         <select id="param">
@@ -125,11 +132,11 @@
     // Инициализация графиков
     const charts = [];
     const chartConfigs = [
-        { id: 'chart1', title: 'Давление прессования', color: 'rgba(75, 192, 192, 1)' },
-        { id: 'chart2', title: 'Скорость охлаждения', color: 'rgba(54, 162, 235, 1)' },
-        { id: 'chart3', title: 'Давление на сплав в пресс-форме', color: 'rgba(150, 99, 132, 1)' },
-        { id: 'chart4', title: 'Скорость поступления сплава', color: 'rgba(255, 159, 64, 1)' },
-        { id: 'chart5', title: 'Температура пресс-формы', color: 'rgba(153, 102, 255, 1)' }
+        {id: 'chart1', title: 'Давление прессования', color: 'rgba(75, 192, 192, 1)'},
+        {id: 'chart2', title: 'Скорость охлаждения', color: 'rgba(54, 162, 235, 1)'},
+        {id: 'chart3', title: 'Давление на сплав в пресс-форме', color: 'rgba(150, 99, 132, 1)'},
+        {id: 'chart4', title: 'Скорость поступления сплава', color: 'rgba(255, 159, 64, 1)'},
+        {id: 'chart5', title: 'Температура пресс-формы', color: 'rgba(153, 102, 255, 1)'}
     ];
 
     // Максимальное количество точек на графике
@@ -167,35 +174,25 @@
         charts.push(chart);
     });
 
+    //Создаем клиента с адресом брокера сообщений
     const stompClient = new StompJs.Client({
         brokerURL: 'ws://localhost:8081/websocket'
     });
+    //Подключаемся
     stompClient.activate();
 
+    //При подключении подписываемся на 5 топиков
     stompClient.onConnect = (frame) => {
-        alert('Connected: ');
-        // stompClient.publish({
-        //     destination: "/app/tables",
-        //     body: 'getTable'
-        // });
-        // stompClient.subscribe('/topic/tableNames', function(message) {
-        //     const names = JSON.parse(message.body).tableNames;
-        //     names.forEach((name, index) => {
-        //         document.getElementById(`table-title-${index+1}`).textContent = name;
-        //     });
-        // });
-        // Подписываемся на все 5 топиков
         for (let i = 1; i <= 5; i++) {
-
-            stompClient.subscribe(`/topic/data/${i}`, function(message) {
+            stompClient.subscribe(`/topic/data/${i}`, function (message) {
+                //Как только приходят данные Json превращаем в объект
                 try {
                     const data = JSON.parse(message.body);
-
-                    // Предполагаем, что данные приходят в формате {chart1: value, chart2: value, ...}
-                        updateChart(charts[i-1], data.value,data.error);
-
+                    //Добавление точки на график
+                    updateChart(charts[i - 1], data.value, data.error);
                 } catch (e) {
-                    console.error("Ошибка обработки данных:", e);
+                    //При ошибке вывод окно с ошибкой
+                    alert("Ошибка обработки данных:" + e);
                 }
             });
         }
@@ -218,19 +215,19 @@
     // };
 
     // Обновление графика новым значением
-    function updateChart(chart, value,error) {
+    function updateChart(chart, value, error) {
         const now = new Date();
         const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
         // Добавляем новую точку данных
         chart.data.labels.push(timeLabel);
         chart.data.datasets[0].data.push(value);
-        if(error){
+        //Меняем цвет и размер точки при выходе за пороговые значения
+        if (error) {
 
             chart.data.datasets[0].pointBackgroundColor.push('rgba(255, 0, 0, 1)');
             chart.data.datasets[0].pointRadius.push(6);
-        }
-        else {
+        } else {
             chart.data.datasets[0].pointBackgroundColor.push(chart.data.datasets[0].borderColor);
             chart.data.datasets[0].pointRadius.push(3);
         }
@@ -248,14 +245,14 @@
     }
 
     // Отправка данных
-    document.getElementById('sendBtn').addEventListener('click', function() {
-        alert("adsad")
+    document.getElementById('sendBtn').addEventListener('click', function () {
+        //Получение вводимых пользователем значений
         const param = document.getElementById('param').value;
         const stage = document.getElementById('stage').value;
         const control = document.getElementById('control').value;
         const minValue = parseFloat(document.getElementById('minValue').value);
         const maxValue = parseFloat(document.getElementById('maxValue').value);
-
+        //Создание объекта для отправки
         const dataToSend = {
             param: param,
             stage: stage,
@@ -263,11 +260,7 @@
             minValue: minValue,
             maxValue: maxValue
         };
-
-        // stompClient.publish("/app/change",JSON.stringify(dataToSend));
-        //
-        // alert("adsad")
-
+        //Отправка данных
         stompClient.publish({
             destination: "/app/change",
             body: JSON.stringify(dataToSend)

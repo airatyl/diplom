@@ -27,20 +27,27 @@ public class KafkaListenerDataFromUserHandler {
     private final UserRepository userRepository;
 
 
+    //Получение данных с топика Kafka data-to-save
     @KafkaListener(topics = "data-to-save", groupId = "group2" )
     public void listener(DataFromWebsocket data) {
-        Paramoneachstage updatingData = paramoneachstageRepository.getParamoneachstageByMoldingstage_IdAndControlparam(data.getStage(), data.getParam());
+        //Получение объекта который нужно изменить
+        Paramoneachstage updatingData = paramoneachstageRepository
+                .getParamoneachstageByMoldingstage_IdAndControlparam(data.getStage(), data.getParam());
+        //Создание объекта с пользователем который совершил операцию и данными операции
         Operationhistory operationhistory =new Operationhistory();
         operationhistory.setData("минимальное значение с "+ updatingData.getMinvalue()+" на "+ data.getMinValue() +
                 " максимальное с " + updatingData.getMaxvalue() +" на " + data.getMaxValue());
-        updatingData.setMaxvalue((float) data.getMaxValue());
-        updatingData.setMinvalue((float) data.getMinValue());
-        updatingData.setNeedcontrol(data.isControl());
-        paramoneachstageRepository.save(updatingData);
         Operation operation = operationRepository.getReferenceById(data.getStage());
         operationhistory.setOperation(operation);
         User user = userRepository.getReferenceById(1);
         operationhistory.setUserid(user);
+        //Изменение пороговых значений
+        updatingData.setMaxvalue(data.getMaxValue());
+        updatingData.setMinvalue(data.getMinValue());
+        updatingData.setNeedcontrol(data.isControl());
+        //Сохранение изменений
+        paramoneachstageRepository.save(updatingData);
+        //Сохранение в историю операций
         operationhistoryRepository.save(operationhistory);
 
     }

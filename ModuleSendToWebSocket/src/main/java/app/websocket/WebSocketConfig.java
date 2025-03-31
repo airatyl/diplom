@@ -12,13 +12,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/topic");//Данные отправляются по адресу начинающего с /topic
+        config.setApplicationDestinationPrefixes("/app");//Данные принимаются с адреса начинающегося с /app
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket");
+        registry.addEndpoint("/websocket");//Адрес сервера брокера сообщений
     }
 
 }

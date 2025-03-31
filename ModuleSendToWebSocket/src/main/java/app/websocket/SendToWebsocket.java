@@ -23,13 +23,15 @@ public class SendToWebsocket {
 
     @MessageMapping("/change")
     public void sendTableNames(DataFromWebsocket message) {
+        //Отправка данных в топик data-to-save
         kafkaTemplate.send("data-to-save",message);
     }
-
-
+    //Получение данных с топика data-to-websocket в data
     @KafkaListener(topics = "data-to-websocket", groupId = "group1" )
     public void sending(DataFromHandler data) {
+        //Создаем объект для отправки по WebSocket
         DataToWebSocketGraph data1 =new DataToWebSocketGraph(data.getValue(), data.isError());
+        //Отправка данных по WebSocket
         messagingTemplate.convertAndSend("/topic/data/" + data.getId(), data1);
 
     }

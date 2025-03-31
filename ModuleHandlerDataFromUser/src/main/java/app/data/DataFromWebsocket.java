@@ -11,6 +11,6 @@ public class DataFromWebsocket {
     private String param;
     private int stage;
     private boolean control;
-    private int minValue;
-    private int maxValue;
+    private float minValue;
+    private float maxValue;
 }
