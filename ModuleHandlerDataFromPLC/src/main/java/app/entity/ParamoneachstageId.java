@@ -12,9 +12,9 @@ import java.util.Objects;
 @Setter
 @Embeddable
 public class ParamoneachstageId implements java.io.Serializable {
-    private static final long serialVersionUID = -4763221872268455288L;
-    @Column(name = "sensor", nullable = false)
-    private Integer sensor;
+    private static final long serialVersionUID = -5687964405822273232L;
+    @Column(name = "controlparam", nullable = false, length = 45)
+    private String controlparam;
 
     @Column(name = "moldingstage", nullable = false)
     private Integer moldingstage;
@@ -24,13 +24,13 @@ public class ParamoneachstageId implements java.io.Serializable {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ParamoneachstageId entity = (ParamoneachstageId) o;
-        return Objects.equals(this.sensor, entity.sensor) &&
+        return Objects.equals(this.controlparam, entity.controlparam) &&
                 Objects.equals(this.moldingstage, entity.moldingstage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sensor, moldingstage);
+        return Objects.hash(controlparam, moldingstage);
     }
 
 }

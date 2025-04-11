@@ -2,8 +2,6 @@ package app.websocket;
 
 
 import app.data.DataFromHandler;
-import app.data.DataFromWebsocket;
-import app.data.DataToWebSocketGraph;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,18 +19,18 @@ public class SendToWebsocket {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/change")
-    public void sendTableNames(DataFromWebsocket message) {
-        //Отправка данных в топик data-to-save
-        kafkaTemplate.send("data-to-save",message);
-    }
+//    @MessageMapping("/change")
+//    public void sendTableNames(DataFromWebsocket message) {
+//        //Отправка данных в топик data-to-save
+//        kafkaTemplate.send("data-to-save",message);
+//    }
     //Получение данных с топика data-to-websocket в data
     @KafkaListener(topics = "data-to-websocket", groupId = "group1" )
     public void sending(DataFromHandler data) {
         //Создаем объект для отправки по WebSocket
-        DataToWebSocketGraph data1 =new DataToWebSocketGraph(data.getValue(), data.isError());
+//        DataToWebSocketGraph data1 =new DataToWebSocketGraph(data.getValue(), data.isError());
         //Отправка данных по WebSocket
-        messagingTemplate.convertAndSend("/topic/data/" + data.getId(), data1);
+        messagingTemplate.convertAndSend("/topic/data", data);
 
     }
 }

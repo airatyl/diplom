@@ -1,31 +1,23 @@
 package app.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class DataFromPLC {
-    private int sensorId;
+    private String address;
     private float value;
-    private int processID;
-
-
-
-    public DataFromPLC(int sensorId, float value, int processID) {
-        this.sensorId = sensorId;
-        this.value = value;
-        this.processID = processID;
-    }
-
-    public DataFromPLC(){}
 
     @Override
     public String toString() {
         return "DataFromPLC{" +
-                "sensorId=" + sensorId +
+                "address=" + address +
                 ", value=" + value +
-                ", processID=" + processID +
                 '}';
     }
 

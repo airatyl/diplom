@@ -1,41 +1,43 @@
 package app.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "sensorvalue")
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "sensorvalue", schema = "process_sch")
 public class Sensorvalue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('sensorvalue_id_seq'::regclass)")
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "value")
+    @Column(name = "value", nullable = false)
     private Float value;
 
-    @Column(name = "recordingtime")
+    @Column(name = "recordingtime", nullable = false)
     private Instant recordingtime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sensor")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "sensor", nullable = false)
     private Sensor sensor;
 
+    @Column(name = "error", nullable = false)
+    private Boolean error = false;
 
-    public Sensorvalue(Float value, Instant recordingtime, Sensor sensor) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "moldingstage", nullable = false)
+    private Moldingstage moldingstage;
+
+    public Sensorvalue(Float value, Instant recordingtime, Sensor sensor, Boolean error, Moldingstage moldingstage) {
         this.value = value;
         this.recordingtime = recordingtime;
         this.sensor = sensor;
+        this.error = error;
+        this.moldingstage = moldingstage;
     }
 }

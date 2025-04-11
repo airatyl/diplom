@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* Стили для навигационной панели */
+        nav {
+            background-color: #333;
+            padding: 10px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        ul.nav-menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul.nav-menu li {
+            margin: 0 15px;
+        }
+
+        ul.nav-menu li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        ul.nav-menu li a:hover {
+            background-color: #555;
+        }
+
+        /* Стиль для активной ссылки (текущей страницы) */
+        ul.nav-menu li a.active {
+            background-color: #4CAF50;
+        }
+    </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .control-panel {
+            grid-column: span 2;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: inline-block;
+            width: 150px;
+            font-size: 20px;
+        }
+
+        select, input {
+            font-size: 20px;
+            padding: 8px;
+            width: 400px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <ul class="nav-menu">
+        <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
+        <li><a href="http://localhost:8081/home/history">История</a></li>
+        <li><a href="http://localhost:8081/home/change">Изменение пороговых значений</a></li>
+        <li><a href="http://localhost:8081/home/graphics" class="active">Графики за период</a></li>
+    </ul>
+</nav>
+<div style="display: flex; justify-content: center;">
+    <div class="control-panel">
+        <h2>Изменение пороговых значений</h2>
+        <div class="form-group">
+            <label for="startDate">Начальная дата:</label>
+            <input type="date" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">Конечная дата:</label>
+            <input type="date" id="endDate" name="endDate" required>
+        </div>
+        <button id="sendBtn">Просмотр</button>
+    </div>
+</div>
+<div class="container">
+    <div class="chart-container">
+        <canvas id="chart1"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart2"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart3"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart4"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart5"></canvas>
+    </div>
+</div>
+
+
+<script>
+    // Инициализация графиков
+    const charts = [];
+    const chartConfigs = [
+        {id: 'chart1', title: 'Входное напряжение главной цепи', color: 'rgba(75, 192, 192, 1)', maxPoints: 50},
+        {id: 'chart2', title: 'Вторичное напряжение', color: 'rgba(54, 162, 235, 1)', maxPoints: 50},
+        {id: 'chart3', title: 'Усилие сжатия стыка', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
+        {id: 'chart4', title: 'Время оплавления', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
+        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30}
+    ];
+
+    // Максимальное количество точек на графике
+    const MAX_DATA_POINTS = 50;
+
+    // Создаем графики
+    chartConfigs.forEach(config => {
+        const ctx = document.getElementById(config.id).getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                maxPoints: config.maxPoints,
+                labels: [],
+                datasets: [{
+
+                    label: config.title,
+                    backgroundColor: config.color,
+                    borderColor: config.color,
+                    pointBackgroundColor: [],
+                    pointRadius: [],
+                    data: [],
+                    fill: false,
+
+                    tension: 0.1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            // This more specific font property overrides the global property
+                            font: {
+                                size: 24
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        charts.push(chart);
+    });
+
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+
+        //Получение вводимых пользователем значений
+        const from = document.getElementById('startDate').value;
+        const to = document.getElementById('endDate').value;
+
+        //Создание объекта для отправки
+        const dataToSend = {
+            from: from,
+            to: to,
+
+        };
+
+        const url = 'http://localhost:8081/home/graphics';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataToSend)
+            });
+            const data = await response.json();
+            data.forEach(item => {
+                for (let i =0; i < chartConfigs.length - 1; i++){
+                    if(chartConfigs[i].title===item.param){
+                        updateChart(charts[i], item.value, item.error,item.recordingTime);
+                        break;
+                    }
+                    // updateChart(charts[i], data.value, data.error);
+                }
+            });
+
+        }
+        catch
+            (error)
+        {
+            alert(`Ошибка запроса: ${error.message}`);
+        }
+
+    })
+    ;
+
+
+    // Обновление графика новым значением
+    function updateChart(chart, value, error,now) {
+        const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
+        if (chart.data.labels.length > chart.data.maxPoints) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[0].pointBackgroundColor.shift();
+            chart.data.datasets[0].pointRadius.shift();
+        }
+        // Добавляем новую точку данных
+        chart.data.labels.push(timeLabel);
+        chart.data.datasets[0].data.push(value);
+        //Меняем цвет и размер точки при выходе за пороговые значения
+        if (error) {
+
+            chart.data.datasets[0].pointBackgroundColor.push('rgba(255, 0, 0, 1)');
+            chart.data.datasets[0].pointRadius.push(6);
+        } else {
+            chart.data.datasets[0].pointBackgroundColor.push(chart.data.datasets[0].borderColor);
+            chart.data.datasets[0].pointRadius.push(3);
+        }
+
+
+        // Ограничиваем количество точек
+
+
+        // Обновляем график
+        chart.update();
+    }
+</script>
+
+</body>
+</html>

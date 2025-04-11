@@ -5,13 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "operationhistory", schema = "kurs_sch")
+@Table(name = "operationhistory", schema = "user_sch")
 public class Operationhistory {
     @Id
-    @ColumnDefault("nextval('kurs_sch.operationhistory_id_seq'::regclass)")
+    @ColumnDefault("nextval('user_sch.operationhistory_id_seq'::regclass)")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
@@ -26,5 +28,8 @@ public class Operationhistory {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "userid", nullable = false)
     private User userid;
+
+    @Column(name = "operation_date", nullable = false)
+    private Instant operationDate;
 
 }

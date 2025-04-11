@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* Стили для навигационной панели */
+        nav {
+            background-color: #333;
+            padding: 10px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        ul.nav-menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul.nav-menu li {
+            margin: 0 15px;
+        }
+
+        ul.nav-menu li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        ul.nav-menu li a:hover {
+            background-color: #555;
+        }
+
+        /* Стиль для активной ссылки (текущей страницы) */
+        ul.nav-menu li a.active {
+            background-color: #4CAF50;
+        }
+    </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .control-panel {
+            grid-column: span 2;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: inline-block;
+            width: 150px;
+            font-size: 20px;
+        }
+
+        select, input {
+            font-size: 20px;
+            padding: 8px;
+            width: 400px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+</head>
+<body>
+<nav>
+    <ul class="nav-menu">
+        <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
+        <li><a href="http://localhost:8081/home/history">История</a></li>
+        <li><a href="http://localhost:8081/home/change" class="active">Изменение пороговых значений</a></li>
+        <li><a href="http://localhost:8081/home/graphics">Графики за период</a></li>
+    </ul>
+</nav>
+
+<div style="display: flex; justify-content: center;">
+    <div class="control-panel">
+        <h2>Изменение пороговых значений</h2>
+        <div class="form-group">
+            <label for="param">Параметр:</label>
+            <select id="param">
+                <option value="Входное напряжение главной цепи">Входное напряжение главной цепи</option>
+                <option value="Вторичное напряжение">Вторичное напряжение</option>
+                <option value="Усилие сжатия стыка">Усилие сжатия стыка</option>
+                <option value="Время оплавления">Скорость поступления сплава</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="stage">Этап сварки:</label>
+            <select id="stage">
+                <option value="1">Деталь помещается в машину для сварки', 'описание для первого этапа</option>
+                <option value="2">Подача напряжения и сближение концов пластины', 'описание для второго этапа</option>
+                <option value="3">Увеличение усилия осадки деталей и выключение сварочного тока</option>
+                <option value="4">Извлечение детали</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="control">Необходимость контролировать:</label>
+            <select id="control">
+                <option value="true">Да</option>
+                <option value="false">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="minValue">Минимальное значение:</label>
+            <input type="number" id="minValue" value="0">
+        </div>
+        <div class="form-group">
+            <label for="maxValue">Максимальное значение</label>
+            <input type="number" id="maxValue" value="0">
+        </div>
+        <button id="sendBtn">Изменить</button>
+    </div>
+</div>
+<script>
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+
+        //Получение вводимых пользователем значений
+        const param = document.getElementById('param').value;
+        const stage = document.getElementById('stage').value;
+        const control = document.getElementById('control').value;
+        const minValue = parseFloat(document.getElementById('minValue').value);
+        const maxValue = parseFloat(document.getElementById('maxValue').value);
+        //Создание объекта для отправки
+        const dataToSend = {
+            param: param,
+            stage: stage,
+            control: control,
+            minValue: minValue,
+            maxValue: maxValue
+        };
+
+        const url = 'http://localhost:8081/home/change';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataToSend)
+            });
+
+            const responseText = await response.text(); // Получаем ответ в виде строки
+
+            if (responseText.trim() === 'OK') {
+                alert('Пороговые значения успешно изменены');
+                // window.location.href = 'http://localhost:8081/home/main'; // Переход при успехе
+            } else {
+                alert(`Ошибка: ${responseText}`); // Вывод ошибки, если ответ не "OK"
+            }
+        } catch (error) {
+            alert(`Ошибка запроса: ${error.message}`);
+        }
+
+    });
+
+</script>
+</body>
+</html>

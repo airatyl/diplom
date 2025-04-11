@@ -7,23 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "paramoneachstage")
+@Table(name = "paramoneachstage", schema = "process_sch")
 public class Paramoneachstage {
     @EmbeddedId
     private ParamoneachstageId id;
-
-    @MapsId("sensor")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sensor", nullable = false)
-    private Sensor sensor;
 
     @MapsId("moldingstage")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "moldingstage", nullable = false)
     private Moldingstage moldingstage;
-
-    @Column(name = "controlparam", nullable = false, length = 45)
-    private String controlparam;
 
     @Column(name = "unitofmeasurement", nullable = false, length = 10)
     private String unitofmeasurement;
@@ -37,4 +29,14 @@ public class Paramoneachstage {
     @Column(name = "needcontrol", nullable = false)
     private Boolean needcontrol = false;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sensor")
+    private Sensor sensor;
+
+    public String getControlChanged(){
+        if(needcontrol){
+            return "да";
+        }
+        return "нет";
+    }
 }

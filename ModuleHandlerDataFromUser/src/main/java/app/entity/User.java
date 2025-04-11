@@ -8,10 +8,10 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Setter
 @Entity
-@Table(name = "users", schema = "kurs_sch")
+@Table(name = "users", schema = "user_sch")
 public class User {
     @Id
-    @ColumnDefault("nextval('kurs_sch.users_id_seq'::regclass)")
+    @ColumnDefault("nextval('user_sch.users_id_seq'::regclass)")
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -20,6 +20,9 @@ public class User {
 
     @Column(name = "lastname", nullable = false, length = 30)
     private String lastname;
+
+    @Column(name = "login", nullable = false, length = 30)
+    private String login;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post", nullable = false)

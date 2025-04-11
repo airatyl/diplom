@@ -11,10 +11,10 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Setter
 @Entity
-@Table(name = "operations", schema = "kurs_sch")
+@Table(name = "operations", schema = "user_sch")
 public class Operation {
     @Id
-    @ColumnDefault("nextval('kurs_sch.operations_id_seq'::regclass)")
+    @ColumnDefault("nextval('user_sch.operations_id_seq'::regclass)")
     @Column(name = "id", nullable = false)
     private Integer id;
 

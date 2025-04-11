@@ -78,6 +78,7 @@ services:
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic raw-data --replication-factor 1 --partitions 1
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic data-to-websocket --replication-factor 1 --partitions 1
       kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic data-to-save --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic process-id --replication-factor 1 --partitions 1
       
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka:9092 --list

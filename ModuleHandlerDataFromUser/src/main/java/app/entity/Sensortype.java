@@ -11,14 +11,14 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Setter
 @Entity
-@Table(name = "sensortypes")
+@Table(name = "sensortypes", schema = "process_sch")
 public class Sensortype {
     @Id
-    @ColumnDefault("nextval('sensortypes_id_seq'::regclass)")
+    @ColumnDefault("nextval('process_sch.sensortypes_id_seq'::regclass)")
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "name", length = 45)
+    @Column(name = "name", nullable = false, length = 45)
     private String name;
 
     @Column(name = "description", length = 100)

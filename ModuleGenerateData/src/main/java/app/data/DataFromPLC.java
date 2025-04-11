@@ -1,4 +1,4 @@
-package app.producer;
+package app.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,16 +10,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataFromPLC {
-    private int sensorId;
+    private String address;
     private double value;
-    private int processID;
 
     @Override
     public String toString() {
         return "DataFromPLC{" +
-                "sensorId=" + sensorId +
+                "address=" + address +
                 ", value=" + value +
-                ", processID=" + processID +
                 '}';
     }
 
