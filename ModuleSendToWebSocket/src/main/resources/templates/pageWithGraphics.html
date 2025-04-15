@@ -22,6 +22,13 @@
             display: flex;
             justify-content: center;
         }
+        .nav-center {
+            display: flex;
+            gap: 1rem; /* отступ между пунктами */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
         ul.nav-menu li {
             margin: 0 15px;
@@ -30,7 +37,7 @@
         ul.nav-menu li a {
             color: white;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 24px;
             padding: 8px 16px;
             border-radius: 4px;
             transition: background-color 0.3s;
@@ -108,10 +115,13 @@
 <body>
 <nav>
     <ul class="nav-menu">
-        <li><a href="http://localhost:8081/home/main" class="active">Мониторинг</a></li>
-        <li><a href="http://localhost:8081/home/history">История</a></li>
-        <li><a href="http://localhost:8081/home/change">Изменение пороговых значений</a></li>
-        <li><a href="http://localhost:8081/home/graphics">Графики за период</a></li>
+        <div class="nav-center">
+            <li><a href="http://localhost:8081/home/main" class="active">Мониторинг</a></li>
+            <li><a href="http://localhost:8081/home/history">История</a></li>
+            <li><a href="http://localhost:8081/home/change">Изменение пороговых значений</a></li>
+            <li><a href="http://localhost:8081/home/graphics" >Графики за период</a></li>
+        </div>
+        <li style="margin-left: auto;"><a href="http://localhost:8081/logout">Выход</a></li>
     </ul>
 </nav>
 <!--<div class="control-panel">-->
@@ -171,6 +181,9 @@
     <div class="chart-container">
         <canvas id="chart5"></canvas>
     </div>
+    <div class="chart-container">
+        <canvas id="chart6"></canvas>
+    </div>
 </div>
 
 <script>
@@ -182,7 +195,7 @@
         {id: 'chart3', title: 'Усилие сжатия стыка', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
         {id: 'chart4', title: 'Время оплавления', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
         {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30},
-        {id: 'chart5', title: 'Время простоя', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
+        {id: 'chart6', title: 'Время простоя', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
     ];
 
     // Максимальное количество точек на графике
@@ -241,7 +254,7 @@
 
     //При подключении подписываемся на 5 топиков
     stompClient.onConnect = (frame) => {
-        alert("good")
+        // alert("good")
         stompClient.subscribe(`/topic/data`, function (message) {
             //Как только приходят данные Json превращаем в объект
             try {

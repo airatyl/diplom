@@ -1,7 +1,5 @@
-package app.consumers;
+package app.kafka.config;
 
-
-import app.data.DataFromPLC;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +17,7 @@ import java.util.Map;
 
 @Configuration
 @EnableKafka
-public class Config {
-
+public class KafkaConsumerConfig {
     @Bean
     KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>>
     kafkaListenerContainerFactory() {
@@ -39,7 +36,6 @@ public class Config {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        //props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DataFromPLC.class);//Класс, который получаем из Kafka
         props.put(JsonDeserializer.TRUSTED_PACKAGES,"*");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return new DefaultKafkaConsumerFactory<>(props);

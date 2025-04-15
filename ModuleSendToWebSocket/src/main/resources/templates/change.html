@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Изменение пороговых значений</title>
     <style>
         /* Стили для навигационной панели */
         nav {
@@ -18,6 +18,13 @@
             display: flex;
             justify-content: center;
         }
+        .nav-center {
+            display: flex;
+            gap: 1rem; /* отступ между пунктами */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
         ul.nav-menu li {
             margin: 0 15px;
@@ -26,7 +33,7 @@
         ul.nav-menu li a {
             color: white;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 24px;
             padding: 8px 16px;
             border-radius: 4px;
             transition: background-color 0.3s;
@@ -90,10 +97,13 @@
 <body>
 <nav>
     <ul class="nav-menu">
-        <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
-        <li><a href="http://localhost:8081/home/history">История</a></li>
-        <li><a href="http://localhost:8081/home/change" class="active">Изменение пороговых значений</a></li>
-        <li><a href="http://localhost:8081/home/graphics">Графики за период</a></li>
+        <div class="nav-center">
+            <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
+            <li><a href="http://localhost:8081/home/history">История</a></li>
+            <li><a href="http://localhost:8081/home/change"  class="active">Изменение пороговых значений</a></li>
+            <li><a href="http://localhost:8081/home/graphics">Графики за период</a></li>
+        </div>
+        <li style="margin-left: auto;"><a href="http://localhost:8081/logout">Выход</a></li>
     </ul>
 </nav>
 
@@ -106,7 +116,8 @@
                 <option value="Входное напряжение главной цепи">Входное напряжение главной цепи</option>
                 <option value="Вторичное напряжение">Вторичное напряжение</option>
                 <option value="Усилие сжатия стыка">Усилие сжатия стыка</option>
-                <option value="Время оплавления">Скорость поступления сплава</option>
+                <option value="Время оплавления">Время оплавления</option>
+                <option value="Время оплавления">Время осадки</option>
             </select>
         </div>
         <div class="form-group">

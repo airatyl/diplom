@@ -7,9 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class DataFromHandler {
-    int id;
-    float value;
-    boolean isError;
-    String param;
+public class LoginLogoutData {
+    String operationName;
+    String login;
 }

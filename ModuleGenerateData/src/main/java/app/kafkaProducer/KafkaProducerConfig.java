@@ -1,5 +1,4 @@
-package app.consumers;
-
+package app.kafkaProducer;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -15,8 +14,6 @@ import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
-
-
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -29,10 +26,8 @@ public class KafkaProducerConfig {
         configProps.put(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 JsonSerializer.class);
-        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS,"false");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
-
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());

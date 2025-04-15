@@ -1,12 +1,10 @@
 package app.controller;
 
-import app.data.DataFromUserChange;
-import app.data.DataFromUserFromToDate;
-import app.data.DataToUserHistory;
-import app.data.DataToWebSocketGraphics;
+import app.data.*;
 import app.service.ChangeService;
 import app.service.GraphicsService;
 import app.service.HistoryService;
+import app.service.SaveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +22,12 @@ public class ControllerFromUser {
     private final ChangeService changeService;
     private final HistoryService historyService;
     private final GraphicsService graphicsService;
+    private final SaveService saveService;
 
     @PostMapping(path = "/change",
             consumes = "application/json",
             produces = "application/json")
     public @ResponseBody String changePage(@RequestBody DataFromUserChange data){
-        System.out.println("12313");
         return changeService.changeMinMax(data);
     }
     @PostMapping(path = "/history",
@@ -47,4 +45,11 @@ public class ControllerFromUser {
 
     }
 
+    @PostMapping(path = "/save",
+            consumes = "application/json",
+            produces = "application/json")
+    public @ResponseBody String saveOperationHistory(@RequestBody LoginLogoutData data){
+        saveService.saveOperationHistory(data.getOperationName(), data.getLogin());
+        return "OK";
+    }
 }

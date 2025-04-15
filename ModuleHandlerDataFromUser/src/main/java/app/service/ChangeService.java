@@ -18,15 +18,10 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class ChangeService {
     private final ParamoneachstageRepository paramoneachstageRepository;
-
     private final OperationhistoryRepository operationhistoryRepository;
-
     private final OperationRepository operationRepository;
-
     private final UserRepository userRepository;
-
-
-
+    //Изменение пороговых значений
     public String changeMinMax(DataFromUserChange data) {
         //Получение объекта который нужно изменить
         Paramoneachstage updatingData = paramoneachstageRepository
@@ -55,6 +50,5 @@ public class ChangeService {
         //Сохранение в историю операций
         operationhistoryRepository.save(operationhistory);
         return "OK";
-
     }
 }

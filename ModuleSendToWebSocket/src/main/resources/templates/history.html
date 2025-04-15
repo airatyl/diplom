@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>История операций</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,6 +63,13 @@
             display: flex;
             justify-content: center;
         }
+        .nav-center {
+            display: flex;
+            gap: 1rem; /* отступ между пунктами */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
         ul.nav-menu li {
             margin: 0 15px;
@@ -71,7 +78,7 @@
         ul.nav-menu li a {
             color: white;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 24px;
             padding: 8px 16px;
             border-radius: 4px;
             transition: background-color 0.3s;
@@ -114,15 +121,17 @@
 <body>
 <nav>
     <ul class="nav-menu">
-        <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
-        <li><a href="http://localhost:8081/home/history" class="active">История</a></li>
-        <li><a href="http://localhost:8081/home/change">Изменение пороговых значений</a></li>
-        <li><a href="http://localhost:8081/home/graphics">Графики за период</a></li>
+        <div class="nav-center">
+            <li><a href="http://localhost:8081/home/main">Мониторинг</a></li>
+            <li><a href="http://localhost:8081/home/history" class="active">История</a></li>
+            <li><a href="http://localhost:8081/home/change">Изменение пороговых значений</a></li>
+            <li><a href="http://localhost:8081/home/graphics" >Графики за период</a></li>
+        </div>
+        <li style="margin-left: auto;"><a href="http://localhost:8081/logout">Выход</a></li>
     </ul>
 </nav>
 <div style="display: flex; justify-content: center;">
     <div class="control-panel">
-        <h2>Изменение пороговых значений</h2>
         <div class="form-group">
             <label for="startDate">Начальная дата:</label>
             <input type="date" id="startDate" name="startDate" required>
@@ -139,8 +148,8 @@
     <table id="dataTable">
         <thead>
         <tr>
-            <th>Данные</th>
             <th>Операция</th>
+            <th>Данные</th>
             <th>Пользователь</th>
             <th>Дата</th>
         </tr>
@@ -183,8 +192,8 @@
                 // Предполагаем, что объект имеет 4 параметра: param1, param2, param3, param4
                 // Замените на реальные названия параметров из вашего API
                 row.innerHTML = `
-                        <td>${item.data || ''}</td>
                         <td>${item.operationName || ''}</td>
+                        <td>${item.data || ''}</td>
                         <td>${item.userLogin || ''}</td>
                         <td>${ `${operDate.getDate().toString().padStart(2, '0')}.${(operDate.getMonth() + 1).toString().padStart(2, '0')}.${operDate.getFullYear()} ${operDate.getHours()}:${operDate.getMinutes()}` || ''}</td>
                     `;
