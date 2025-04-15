@@ -9,5 +9,4 @@ public interface ParamoneachstageRepository extends JpaRepository<Paramoneachsta
     Paramoneachstage getParamoneachstageByMoldingstage_IdAndId_Controlparam(Integer moldingstage_id, String controlparam);
     Paramoneachstage getFirstBySensor_AddressAndMoldingstage_Id(String sensor_address, Integer moldingstage_id);
 
-    Paramoneachstage getParamoneachstageBySensor_AddressAndMoldingstage_Id(Object unknownAttr1, Integer id);
 }

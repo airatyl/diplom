@@ -2,6 +2,7 @@ package app.data;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -10,6 +11,6 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 public class DataFromUserFromToDate {
-    private Date from;
-    private Date to;
+    private LocalDateTime from;
+    private LocalDateTime to;
 }

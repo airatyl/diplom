@@ -15,6 +15,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @Component
@@ -34,6 +36,7 @@ public class KafkaListenerDataFromPLCHandler {
 
     private long prevTimeOpl;
     private long prevTimeOsad;
+    private long prevTimeProst;
     private long currentTime;
 
     //Получение данных из raw-data в data
@@ -53,7 +56,7 @@ public class KafkaListenerDataFromPLCHandler {
         //Сохранение данных с датчика в базе данных
 
         sensorvalueRepository.save(new Sensorvalue(data.getValue()
-                , Instant.now()
+                , LocalDateTime.now().toInstant(ZoneOffset.UTC)
                 , sensorRepository.getReferenceByAddress(data.getAddress())
                 , graph.isError()
                 , moldingstageRepository.getReferenceById(processID)));
@@ -62,6 +65,22 @@ public class KafkaListenerDataFromPLCHandler {
     @KafkaListener(topics = "process-id", groupId = "group3")
     public void timesCalculation(DataProcess process) {
         processID = process.getProcess();
+        if(processID==1){
+            currentTime = new Date().getTime();
+            DataToWebSocketGraph graph = new DataToWebSocketGraph();
+
+            graph.setValue((currentTime - prevTimeProst) / 1000F);
+            graph.setParam("Время простоя");
+            //сравнивание значения с пороговыми
+            graph.setError(false);
+            kafkaTemplate.send("data-to-websocket", graph);
+            sensorvalueRepository.save(new Sensorvalue(graph.getValue()
+                    , LocalDateTime.now().toInstant(ZoneOffset.UTC)
+                    , sensorRepository.getReferenceByAddress("add6")
+                    , graph.isError()
+                    , moldingstageRepository.getReferenceById(processID)));
+        }
+
         if (processID == 2) {
             prevTimeOpl = new Date().getTime();
         }
@@ -77,13 +96,14 @@ public class KafkaListenerDataFromPLCHandler {
             //сравнивание значения с пороговыми
             graph.setError(answer.getNeedcontrol() && (currentTime - prevTimeOpl < answer.getMinvalue() || currentTime - prevTimeOpl > answer.getMaxvalue()));
             kafkaTemplate.send("data-to-websocket", graph);
-            sensorvalueRepository.save(new Sensorvalue((float) process.getProcess()
-                    , Instant.now()
+            sensorvalueRepository.save(new Sensorvalue(graph.getValue()
+                    , LocalDateTime.now().toInstant(ZoneOffset.UTC)
                     , sensorRepository.getReferenceByAddress("add4")
                     , graph.isError(),moldingstageRepository.getReferenceById(processID)));
         }
         if (processID == 4) {
             currentTime = new Date().getTime();
+            prevTimeProst=currentTime;
             Paramoneachstage answer = paramoneachstageRepository
                     .getParamoneachstageByMoldingstage_IdAndId_Controlparam(processID, "Время осадки");
             DataToWebSocketGraph graph = new DataToWebSocketGraph();
@@ -93,8 +113,8 @@ public class KafkaListenerDataFromPLCHandler {
             //сравнивание значения с пороговыми
             graph.setError(answer.getNeedcontrol() && (currentTime - prevTimeOsad < answer.getMinvalue() || currentTime - prevTimeOsad > answer.getMaxvalue()));
             kafkaTemplate.send("data-to-websocket", graph);
-            sensorvalueRepository.save(new Sensorvalue((float) process.getProcess()
-                    , Instant.now()
+            sensorvalueRepository.save(new Sensorvalue(graph.getValue()
+                    , LocalDateTime.now().toInstant(ZoneOffset.UTC)
                     , sensorRepository.getReferenceByAddress("add5")
                     , graph.isError()
                     , moldingstageRepository.getReferenceById(processID)));

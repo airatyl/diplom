@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/home")
@@ -58,6 +59,7 @@ public class MainPage {
             produces = "application/json")
     public @ResponseBody String history(@RequestBody DataFromUserFromToDate data) throws IOException, InterruptedException {
         ObjectMapper mapper =new ObjectMapper();
+        mapper.findAndRegisterModules();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8084/home/history"))
@@ -77,6 +79,8 @@ public class MainPage {
             produces = "application/json")
     public @ResponseBody String graphics(@RequestBody DataFromUserFromToDate data) throws IOException, InterruptedException {
         ObjectMapper mapper =new ObjectMapper();
+        mapper.findAndRegisterModules();
+        System.out.println(data.getFrom());
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8084/home/graphics"))

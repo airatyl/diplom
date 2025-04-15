@@ -181,7 +181,8 @@
         {id: 'chart2', title: 'Вторичное напряжение', color: 'rgba(54, 162, 235, 1)', maxPoints: 50},
         {id: 'chart3', title: 'Усилие сжатия стыка', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
         {id: 'chart4', title: 'Время оплавления', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
-        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30}
+        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30},
+        {id: 'chart5', title: 'Время простоя', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
     ];
 
     // Максимальное количество точек на графике
@@ -247,7 +248,7 @@
 
                 const data = JSON.parse(message.body);
                 // alert(data)
-                for (let i =0; i < chartConfigs.length - 1; i++){
+                for (let i =0; i < chartConfigs.length; i++){
                     if(chartConfigs[i].title===data.param){
                         updateChart(charts[i], data.value, data.error);
                         break;

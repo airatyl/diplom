@@ -9,6 +9,7 @@ import app.repository.SensorvalueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +22,10 @@ public class GraphicsService {
 
     public List<DataToWebSocketGraphics> getGraphics(DataFromUserFromToDate data) {
         List<DataToWebSocketGraphics> list = new ArrayList<>();
+        System.out.println(data.getFrom().toInstant(ZoneOffset.UTC));
 
         List<Sensorvalue> sensorvalues =sensorvalueRepository
-                .findAllByRecordingtimeBetween(data.getFrom().toInstant(), data.getTo().toInstant());
+                .findAllByRecordingtimeBetween(data.getFrom().toInstant(ZoneOffset.UTC), data.getTo().toInstant(ZoneOffset.UTC));
 
 
         //Создание объекта для отправки в Kafka

@@ -7,6 +7,7 @@ import app.repository.OperationhistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ public class HistoryService {
 
     public List<DataToUserHistory> operationhistories(DataFromUserFromToDate data){
         List<DataToUserHistory> response = new ArrayList<>();
-        List<Operationhistory> operationhistory = operationhistoryRepository.findAllByOperationDateBetween(data.getFrom().toInstant(), data.getTo().toInstant());
+        List<Operationhistory> operationhistory = operationhistoryRepository.findAllByOperationDateBetween(data.getFrom().toInstant(ZoneOffset.UTC), data.getTo().toInstant(ZoneOffset.UTC));
         if(!operationhistory.isEmpty())
         for(Operationhistory o : operationhistory){
             response.add(new DataToUserHistory(o.getData(),o.getOperation().getName(),o.getUserid().getLogin(), Date.from(o.getOperationDate())));

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Графики за период</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Стили для навигационной панели */
         nav {
@@ -84,6 +85,14 @@
         button:hover {
             background-color: #45a049;
         }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -100,11 +109,11 @@
         <h2>Изменение пороговых значений</h2>
         <div class="form-group">
             <label for="startDate">Начальная дата:</label>
-            <input type="date" id="startDate" name="startDate" required>
+            <input type="datetime-local" id="startDate" name="startDate" required>
         </div>
         <div class="form-group">
             <label for="endDate">Конечная дата:</label>
-            <input type="date" id="endDate" name="endDate" required>
+            <input type="datetime-local" id="endDate" name="endDate" required>
         </div>
         <button id="sendBtn">Просмотр</button>
     </div>
@@ -136,7 +145,8 @@
         {id: 'chart2', title: 'Вторичное напряжение', color: 'rgba(54, 162, 235, 1)', maxPoints: 50},
         {id: 'chart3', title: 'Усилие сжатия стыка', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
         {id: 'chart4', title: 'Время оплавления', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
-        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30}
+        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30},
+        {id: 'chart6', title: 'Время простоя', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
     ];
 
     // Максимальное количество точек на графике
@@ -187,7 +197,6 @@
     });
 
     document.getElementById('sendBtn').addEventListener('click', async () => {
-
         //Получение вводимых пользователем значений
         const from = document.getElementById('startDate').value;
         const to = document.getElementById('endDate').value;
@@ -209,8 +218,15 @@
                 body: JSON.stringify(dataToSend)
             });
             const data = await response.json();
+            for (let i =0; i < chartConfigs.length ; i++){
+                charts[i].data.labels =[];
+                charts[i].data.datasets[0].data=[];
+                charts[i].data.datasets[0].pointBackgroundColor=[];
+                charts[i].data.datasets[0].pointRadius=[];
+            }
+
             data.forEach(item => {
-                for (let i =0; i < chartConfigs.length - 1; i++){
+                for (let i =0; i < chartConfigs.length ; i++){
                     if(chartConfigs[i].title===item.param){
                         updateChart(charts[i], item.value, item.error,item.recordingTime);
                         break;
@@ -231,15 +247,10 @@
 
 
     // Обновление графика новым значением
-    function updateChart(chart, value, error,now) {
+    function updateChart(chart, value, error,time) {
+        const now = new Date(time);
         const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 
-        if (chart.data.labels.length > chart.data.maxPoints) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
-            chart.data.datasets[0].pointBackgroundColor.shift();
-            chart.data.datasets[0].pointRadius.shift();
-        }
         // Добавляем новую точку данных
         chart.data.labels.push(timeLabel);
         chart.data.datasets[0].data.push(value);
