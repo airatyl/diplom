@@ -29,15 +29,23 @@ public class GraphicsService {
 
 
         //Создание объекта для отправки в Kafka
+        String controlParam="";
         for(Sensorvalue sensor : sensorvalues){
-            Paramoneachstage answer = paramoneachstageRepository
-                    .getFirstBySensor_AddressAndMoldingstage_Id(sensor.getSensor().getAddress(),sensor.getMoldingstage().getId());
+            controlParam = switch (sensor.getSensor().getAddress()) {
+                case "add1" -> "Входное напряжение главной цепи";
+                case "add2" -> "Вторичное напряжение";
+                case "add3" -> "Усилие сжатия стыка";
+                case "add4" -> "Время оплавления";
+                case "add5" -> "Время осадки";
+                case "add6" -> "Время простоя";
+                default -> controlParam;
+            };
             DataToWebSocketGraphics graph= new DataToWebSocketGraphics();
             graph.setValue(sensor.getValue());
             graph.setRecordingTime(Date.from(sensor.getRecordingtime()));
-            graph.setParam(answer.getId().getControlparam());
+            graph.setParam(controlParam);
             //сравнивание значения с пороговыми
-            graph.setError(answer.getNeedcontrol() && (sensor.getValue() < answer.getMinvalue() || sensor.getValue() > answer.getMaxvalue()));
+            graph.setError(sensor.getError());
             list.add(graph);
         }
 

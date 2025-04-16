@@ -94,7 +94,7 @@ public class KafkaListenerDataFromPLCHandler {
             graph.setValue((currentTime - prevTimeOpl) / 1000F);
             graph.setParam("Время оплавления");
             //Сравнивание значения с пороговыми
-            graph.setError(answer.getNeedcontrol() && (currentTime - prevTimeOpl < answer.getMinvalue() || currentTime - prevTimeOpl > answer.getMaxvalue()));
+            graph.setError(answer.getNeedcontrol() && ((currentTime - prevTimeOpl)/ 1000F < answer.getMinvalue() || (currentTime - prevTimeOpl)/ 1000F > answer.getMaxvalue()));
             //Отправка данных в топик Kafka data-to-websocket
             kafkaTemplate.send("data-to-websocket", graph);
             //Сохранение в базу данных
@@ -113,7 +113,7 @@ public class KafkaListenerDataFromPLCHandler {
             graph.setValue((currentTime - prevTimeOsad) / 1000F);
             graph.setParam("Время осадки");
             //Сравнивание значения с пороговыми
-            graph.setError(answer.getNeedcontrol() && (currentTime - prevTimeOsad < answer.getMinvalue() || currentTime - prevTimeOsad > answer.getMaxvalue()));
+            graph.setError(answer.getNeedcontrol() && ((currentTime - prevTimeOsad)/ 1000F < answer.getMinvalue() || (currentTime - prevTimeOsad)/ 1000F > answer.getMaxvalue()));
             //Отправка данных в топик Kafka data-to-websocket
             kafkaTemplate.send("data-to-websocket", graph);
             //Сохранение в базу данных

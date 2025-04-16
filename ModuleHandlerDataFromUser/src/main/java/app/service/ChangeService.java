@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -31,16 +33,16 @@ public class ChangeService {
         }
         //Создание объекта с пользователем который совершил операцию и данными операции
         Operationhistory operationhistory =new Operationhistory();
-        operationhistory.setData("Параметр:"+data.getParam()
-                +"Этап"+updatingData.getMoldingstage().getName()
-                +"Минимальное значение:"+ updatingData.getMinvalue()+"->"+ data.getMinValue()
-                +" Максимальное:" + updatingData.getMaxvalue() +"->" + data.getMaxValue()
-                +" Контроль:"+updatingData.getControlChanged()+"->"+data.getControlChanged());
+        operationhistory.setData("Параметр: "+data.getParam()
+                +" Этап: "+updatingData.getMoldingstage().getName()
+                +"Минимальное значение: "+ updatingData.getMinvalue()+"->"+ data.getMinValue()
+                +" Максимальное: " + updatingData.getMaxvalue() +"->" + data.getMaxValue()
+                +" Контроль: "+updatingData.getControlChanged()+"->"+data.getControlChanged());
         Operation operation = operationRepository.getOperationByName("Изменение пороговых значений");
         operationhistory.setOperation(operation);
         User user = userRepository.getUserByLogin(data.getLogin());
         operationhistory.setUserid(user);
-        operationhistory.setOperationDate(Instant.now());
+        operationhistory.setOperationDate(LocalDateTime.now().toInstant(ZoneOffset.UTC));
         //Изменение пороговых значений
         updatingData.setMaxvalue(data.getMaxValue());
         updatingData.setMinvalue(data.getMinValue());

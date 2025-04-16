@@ -19,6 +19,7 @@
             display: flex;
             justify-content: center;
         }
+
         .nav-center {
             display: flex;
             gap: 1rem; /* отступ между пунктами */
@@ -231,27 +232,26 @@
                 body: JSON.stringify(dataToSend)
             });
             const data = await response.json();
-            for (let i =0; i < chartConfigs.length ; i++){
-                charts[i].data.labels =[];
-                charts[i].data.datasets[0].data=[];
-                charts[i].data.datasets[0].pointBackgroundColor=[];
-                charts[i].data.datasets[0].pointRadius=[];
+            for (let i = 0; i < chartConfigs.length; i++) {
+                charts[i].data.labels = [];
+                charts[i].data.datasets[0].data = [];
+                charts[i].data.datasets[0].pointBackgroundColor = [];
+                charts[i].data.datasets[0].pointRadius = [];
+            }
+            if (!data.empty()) {
+                data.forEach(item => {
+                    for (let i = 0; i < chartConfigs.length; i++) {
+                        if (chartConfigs[i].title === item.param) {
+                            updateChart(charts[i], item.value, item.error, item.recordingTime);
+                            break;
+                        }
+                        // updateChart(charts[i], data.value, data.error);
+                    }
+                });
             }
 
-            data.forEach(item => {
-                for (let i =0; i < chartConfigs.length ; i++){
-                    if(chartConfigs[i].title===item.param){
-                        updateChart(charts[i], item.value, item.error,item.recordingTime);
-                        break;
-                    }
-                    // updateChart(charts[i], data.value, data.error);
-                }
-            });
-
-        }
-        catch
-            (error)
-        {
+        } catch
+            (error) {
             alert(`Ошибка запроса: ${error.message}`);
         }
 
@@ -260,7 +260,7 @@
 
 
     // Обновление графика новым значением
-    function updateChart(chart, value, error,time) {
+    function updateChart(chart, value, error, time) {
         const now = new Date(time);
         const timeLabel = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
 

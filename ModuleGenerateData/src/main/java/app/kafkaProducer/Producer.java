@@ -20,20 +20,20 @@ public class Producer {
         if(count==5){
             process=2;
             kafkaTemplate.send("process-id",new DataProcess(process));
-        } else if (count==20) {
+        } else if (count==10) {
             process=3;
             kafkaTemplate.send("process-id",new DataProcess(process));
-        }else if (count==22) {
+        }else if (count==12) {
             process=4;
             kafkaTemplate.send("process-id",new DataProcess(process));
-        }else if (count==27) {
+        }else if (count==17) {
             process=0;
             kafkaTemplate.send("process-id",new DataProcess(process));
-        }else if (count==37) {
+        }else if (count==27) {
             process=1;
             kafkaTemplate.send("process-id",new DataProcess(process));
         }
-        count =count%37+1;
+        count =count%27+1;
     }
     //Отправка параметра входное напряжение главной цепи
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.SECONDS)

@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class SaveService {
         operationhistory.setOperation(operation);
         User user = userRepository.getUserByLogin(login);
         operationhistory.setUserid(user);
-        operationhistory.setOperationDate(Instant.now());
+        operationhistory.setOperationDate(LocalDateTime.now().toInstant(ZoneOffset.UTC));
         operationhistoryRepository.save(operationhistory);
     }
 }

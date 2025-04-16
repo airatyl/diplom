@@ -59,6 +59,7 @@ public class MainPage {
     public @ResponseBody String history(@RequestBody DataFromUserFromToDate data) throws IOException, InterruptedException {
         ObjectMapper mapper =new ObjectMapper();
         mapper.findAndRegisterModules();
+        System.out.println(data.getFrom());
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8084/home/history"))
