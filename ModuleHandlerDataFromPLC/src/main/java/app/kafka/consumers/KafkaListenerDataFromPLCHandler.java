@@ -68,7 +68,7 @@ public class KafkaListenerDataFromPLCHandler {
             DataToWebSocketGraph graph = new DataToWebSocketGraph();
             //Вычисление времени простоя
             graph.setValue((currentTime - prevTimeProst) / 1000F);
-            graph.setParam("Время простоя");
+            graph.setParam("Время простоя, с");
             graph.setError(false);
             //Отправка данных в топик Kafka data-to-websocket
             kafkaTemplate.send("data-to-websocket", graph);
@@ -87,12 +87,12 @@ public class KafkaListenerDataFromPLCHandler {
             prevTimeOsad = currentTime;
             //Получение пороговых значений для датчика, который отправил данные и этапа литья из базы данных
             Paramoneachstage answer = paramoneachstageRepository
-                    .getParamoneachstageByMoldingstage_IdAndId_Controlparam(processID, "Время оплавления");
+                    .getParamoneachstageByMoldingstage_IdAndId_Controlparam(processID, "Время оплавления, с");
             //Создание объекта для отправки в Kafka
             DataToWebSocketGraph graph = new DataToWebSocketGraph();
             //Вычисление времени оплавления
             graph.setValue((currentTime - prevTimeOpl) / 1000F);
-            graph.setParam("Время оплавления");
+            graph.setParam("Время оплавления, с");
             //Сравнивание значения с пороговыми
             graph.setError(answer.getNeedcontrol() && ((currentTime - prevTimeOpl)/ 1000F < answer.getMinvalue() || (currentTime - prevTimeOpl)/ 1000F > answer.getMaxvalue()));
             //Отправка данных в топик Kafka data-to-websocket
@@ -107,11 +107,11 @@ public class KafkaListenerDataFromPLCHandler {
             currentTime = new Date().getTime();
             //Получение пороговых значений для датчика, который отправил данные и этапа литья из базы данных
             Paramoneachstage answer = paramoneachstageRepository
-                    .getParamoneachstageByMoldingstage_IdAndId_Controlparam(processID, "Время осадки");
+                    .getParamoneachstageByMoldingstage_IdAndId_Controlparam(processID, "Время осадки, с");
             //Создание объекта для отправки в Kafka
             DataToWebSocketGraph graph = new DataToWebSocketGraph();
             graph.setValue((currentTime - prevTimeOsad) / 1000F);
-            graph.setParam("Время осадки");
+            graph.setParam("Время осадки, с");
             //Сравнивание значения с пороговыми
             graph.setError(answer.getNeedcontrol() && ((currentTime - prevTimeOsad)/ 1000F < answer.getMinvalue() || (currentTime - prevTimeOsad)/ 1000F > answer.getMaxvalue()));
             //Отправка данных в топик Kafka data-to-websocket

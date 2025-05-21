@@ -32,12 +32,12 @@ public class GraphicsService {
         String controlParam="";
         for(Sensorvalue sensor : sensorvalues){
             controlParam = switch (sensor.getSensor().getAddress()) {
-                case "add1" -> "Входное напряжение главной цепи";
-                case "add2" -> "Вторичное напряжение";
-                case "add3" -> "Усилие сжатия стыка";
-                case "add4" -> "Время оплавления";
-                case "add5" -> "Время осадки";
-                case "add6" -> "Время простоя";
+                case "add1" -> "Входное напряжение главной цепи, В";
+                case "add2" -> "Вторичное напряжение, В";
+                case "add3" -> "Усилие сжатия стыка, кН";
+                case "add4" -> "Время оплавления, с";
+                case "add5" -> "Время осадки, с";
+                case "add6" -> "Время простоя, с";
                 default -> controlParam;
             };
             DataToWebSocketGraphics graph= new DataToWebSocketGraphics();

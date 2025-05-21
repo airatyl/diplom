@@ -155,12 +155,12 @@
     // Инициализация графиков
     const charts = [];
     const chartConfigs = [
-        {id: 'chart1', title: 'Входное напряжение главной цепи', color: 'rgba(75, 192, 192, 1)', maxPoints: 50},
-        {id: 'chart2', title: 'Вторичное напряжение', color: 'rgba(54, 162, 235, 1)', maxPoints: 50},
-        {id: 'chart3', title: 'Усилие сжатия стыка', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
-        {id: 'chart4', title: 'Время оплавления', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
-        {id: 'chart5', title: 'Время осадки', color: 'rgba(153, 102, 255, 1)', maxPoints: 30},
-        {id: 'chart6', title: 'Время простоя', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
+        {id: 'chart1', title: 'Входное напряжение главной цепи, В', color: 'rgba(75, 192, 192, 1)', maxPoints: 50},
+        {id: 'chart2', title: 'Вторичное напряжение, В', color: 'rgba(54, 162, 235, 1)', maxPoints: 50},
+        {id: 'chart3', title: 'Усилие сжатия стыка, кН', color: 'rgba(150, 99, 132, 1)', maxPoints: 50},
+        {id: 'chart4', title: 'Время оплавления, с', color: 'rgba(255, 159, 64, 1)', maxPoints: 10},
+        {id: 'chart5', title: 'Время осадки, с', color: 'rgba(153, 102, 255, 1)', maxPoints: 30},
+        {id: 'chart6', title: 'Время простоя, с', color: 'rgba(153, 155, 255, 1)', maxPoints: 30}
     ];
 
     // Максимальное количество точек на графике
@@ -238,17 +238,16 @@
                 charts[i].data.datasets[0].pointBackgroundColor = [];
                 charts[i].data.datasets[0].pointRadius = [];
             }
-            if (!data.empty()) {
-                data.forEach(item => {
-                    for (let i = 0; i < chartConfigs.length; i++) {
-                        if (chartConfigs[i].title === item.param) {
-                            updateChart(charts[i], item.value, item.error, item.recordingTime);
-                            break;
-                        }
-                        // updateChart(charts[i], data.value, data.error);
+            data.forEach(item => {
+                for (let i = 0; i < chartConfigs.length; i++) {
+                    if (chartConfigs[i].title === item.param) {
+                        updateChart(charts[i], item.value, item.error, item.recordingTime);
+                        break;
                     }
-                });
-            }
+                    // updateChart(charts[i], data.value, data.error);
+                }
+            });
+
 
         } catch
             (error) {
