@@ -13,6 +13,15 @@
 
 Kafka поднималась в Docker.
 В качестве БД использовался PostgreSQL.
+# Технологии и инструменты используемые в проекте
+- VCS, Git, GitHub
+- Build Tool Gradle
+- Spring Framework, Spring Boot
+- WEB MVC
+- SQL, PostqreSQL, ORM, JPA, Hibernate
+- Kafka
+- Docker
+- WebSocket
 # Веб-страница приложения
 - Просмотр графиков контролируемы параметров
 <img width="1518" height="626" alt="image" src="https://github.com/user-attachments/assets/b80de133-693d-446b-80a5-a23338369ab6" />
